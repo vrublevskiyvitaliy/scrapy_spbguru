@@ -6,17 +6,24 @@
 # http://doc.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from urlparse import urlparse
+import urllib2
 
 
 class SpbBuilding(scrapy.Item):
-    # define the fields for your item here like:
     name = scrapy.Field()
     spbguru_href = scrapy.Field()
-    # spbguru_company_href = scrapy.Field()
+    building_card = scrapy.Field()
+    saler_href = scrapy.Field()
 
-    spbguru_saler_href = scrapy.Field()
-    # saler_href
-
+    def set_saler_href(self, url):
+        user_agent = 'Mozilla/5.0 (Windows NT 6.1; Win64; x64)'
+        headers = {'User-Agent': user_agent}
+        req = urllib2.Request(url, headers=headers)
+        response = urllib2.urlopen(req)
+        url = response.geturl()
+        u = urlparse(url)
+        self['saler_href'] = u.scheme + "://" + u.netloc + u.path
 
 
 class SpbCompany(scrapy.Item):

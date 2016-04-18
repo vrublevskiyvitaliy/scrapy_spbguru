@@ -1,11 +1,12 @@
 from scrapy import *
-from ..items import SpbBuildingCard
+from ..items import SpbBuilding
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
+import re
 
 
-class SPBGuruSpider(CrawlSpider):
-    name = 'spbguru'
+class SPBGuruBuildingsSpider(CrawlSpider):
+    name = 'spbguru_buildings'
     allowed_domains = ["spbguru.ru"]
     start_urls = ["http://spbguru.ru/novostroyki"]
 
@@ -17,13 +18,29 @@ class SPBGuruSpider(CrawlSpider):
         sel = Selector(response)
 
         all_href_cards = sel.xpath('.//*[@id=\'catalog_list\']/li/a[@class=\'n\']/@href')
-        items = []
-        for href in all_href_cards:
-            item = SpbBuildingCard()
-            # item['name'] = card.xpath('a[@class=\'n\']/text()').extract()
-            item['href'] = href.extract()
-            # item['url'] = site.xpath('a/@href').extract()
-            # item['description'] = site.xpath('text()').re('-\s[^\n]*\\r')
-            items.append(item)
 
-        return items
+        for href in all_href_cards:
+            item_href = href.extract()
+            yield Request(item_href, callback=self.parse_building)
+
+    def parse_building(self, response):
+        sel = Selector(response)
+
+        item = SpbBuilding()
+
+        item['name'] = sel.xpath('.//*[@id=\'BuildTitle\']/h1/text()').extract()
+        item['spbguru_href'] = response.url
+        try:
+            url = sel.xpath('.//*[@class=\'topT\']//a[contains(@href, \'teaser\')]/@href').extract()[0]
+            item.set_saler_href(url)
+        except Exception as e:
+            item['saler_href'] = ''
+
+        item['building_card'] = self.remove_html_tags(sel.xpath('.//*[@id=\'BuildData\']').extract()[0])
+        return item
+
+    def remove_html_tags(self, html):
+        TAG_RE = re.compile(r'<[^>]+>')
+        return TAG_RE.sub('', html)
+
+    parse_start_url = parse_items
