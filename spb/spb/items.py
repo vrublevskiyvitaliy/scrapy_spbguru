@@ -28,16 +28,5 @@ class SpbBuilding(scrapy.Item):
 
 class SpbCompany(scrapy.Item):
     name = scrapy.Field()
-    address = scrapy.Field()
-    phone = scrapy.Field()
-    official_site = scrapy.Field()
-    date_of_creation = scrapy.Field()
-    list_of_buildings = scrapy.Field()
-
-
-class SpbBuildingCard(scrapy.Item):
-    name = scrapy.Field()
-    href = scrapy.Field()
-    # region = scrapy.Field()
-    # metro = scrapy.Field()
-    # company_name = scrapy.Field()
+    spbguru_href = scrapy.Field()
+    company_card = scrapy.Field()
