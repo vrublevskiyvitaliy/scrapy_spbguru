@@ -28,7 +28,7 @@ class SPBGuruBuildingsSpider(CrawlSpider):
 
         item = SpbBuilding()
 
-        item['name'] = sel.xpath('.//*[@id=\'BuildTitle\']/h1/text()').extract()
+        item['name'] = sel.xpath('.//*[@id=\'BuildTitle\']/h1/text()').extract()[0]
         item['spbguru_href'] = response.url
         try:
             url = sel.xpath('.//*[@class=\'topT\']//a[contains(@href, \'teaser\')]/@href').extract()[0]
