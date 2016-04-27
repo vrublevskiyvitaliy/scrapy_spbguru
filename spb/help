@@ -1,0 +1,1 @@
+ scrapy crawl spbguru_buildings -o buildings_all.xml -t xml
